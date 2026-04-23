@@ -9,11 +9,16 @@ pipeline {
                 }
             }
         }
-        stage('Build Docker Image') {
+        stage('Build') {
             steps {
-                // This builds your container using the Dockerfile in the root
-                sh 'docker build -t makeup-store:latest .'
-            }
+                // This 'ls' command will list everything in the current folder so we can see what's happening
+                sh 'ls -R' 
+        
+                dir('src-app') {
+                    sh 'npm install'
+                    sh 'npm run build'
         }
+    }
+}
     }
 }
