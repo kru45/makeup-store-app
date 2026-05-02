@@ -1,7 +1,14 @@
 pipeline {
     agent any
+
     stages {
+
         stage('Build React') {
+            agent {
+                docker {
+                    image 'node:18'
+                }
+            }
             steps {
                 dir('src-app') {
                     sh 'npm install'
@@ -9,16 +16,18 @@ pipeline {
                 }
             }
         }
-        stage('Build') {
+
+        stage('Build Docker Image') {
             steps {
-                // This 'ls' command will list everything in the current folder so we can see what's happening
-                sh 'ls -R' 
-        
-                dir('src-app') {
-                    sh 'npm install'
-                    sh 'npm run build'
+                sh 'docker build -t makeup-store-app .'
+            }
         }
-    }
-}
+
+        stage('Run Container') {
+            steps {
+                sh 'docker rm -f makeup-store-container || true'
+                sh 'docker run -d -p 3001:80 --name makeup-store-container makeup-store-app'
+            }
+        }
     }
 }
